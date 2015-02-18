@@ -2,7 +2,7 @@
 A javascript lib to provide bootstrap form validation by the help of jQuery
 
 Usage:
-
+<code>
 <form class="form-horizontal" data-validate>
     <div class="form-group">
         <label for="areaCode" class="col-sm-3">Area code :</label>
@@ -17,3 +17,4 @@ Usage:
     </div>
     <input type="submit" />
 </form>
+</code>
