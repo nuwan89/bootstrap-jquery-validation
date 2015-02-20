@@ -157,31 +157,55 @@ $(function () {
     function setupDynamic() {
         $(".form-horizontal .form-group").find("input[type=text].form-control, textarea.form-control")
                 .each(function () {
-                    $(this).keyup(function (event) {
-                        //Following code segment is repeating!
-                        //********************************************************
+                    if ($(this).data("validation-summernote")) {
                         var isValidate = $(this).data("validate");
                         if (isValidate) {
-                            console.log("VALIDATING!");
                             //Get all validation rules
                             var validationRules = isValidate;
-                            var rule1 = new $V.Validator();
-                            rule1.name = validationRules;
-                            var fieldValue = $(this).val();
-                            //console.log();
-                            var labelText = $($("label[for='" + this.id + "']")[0]).text();
-                            //$("label[for='"+$(this)[0].id+"']").text()
-                            var validationMessage = rule1.validate(fieldValue, $.trim(labelText).replace(":", ""));
-                            if (validationMessage) {//Error exists
-                                showFieldErrors($(this), validationMessage);
-                                isFormValid = false;
-                            } else {//Data submitted is valid
-                                clearFieldErrors($(this));
-                            }
+                            //not supported in IE8 (and below)
+                            var fieldElement = $(this);
+                            $(this).siblings().find("div.note-editable").bind("DOMSubtreeModified", function () {
+                                performValidation(fieldElement, validationRules, $(this));
+                            });
                         }
-                    });
-                    //********************************************************
+                    } else {
+                        $(this).keyup(function (event) {
+                            var isValidate = $(this).data("validate");
+                            if (isValidate) {
+                                //Get all validation rules
+                                var validationRules = isValidate;
+                                performValidation($(this), validationRules, false);
+                            }
+                        });
+                    }
                 });
+    }
+    /**
+     * Document this method!
+     * 
+     * @param {type} element
+     * @param {type} validationRules
+     * @param {type} summernote
+     * @returns {Boolean}
+     */
+    function performValidation(element, validationRules, summernote) {
+        var rule1 = new $V.Validator();
+        rule1.name = validationRules;
+        var fieldValue = null;
+        if (summernote) {
+            fieldValue = $(summernote).text();
+        } else {
+            fieldValue = $(element).val();
+        }
+        var labelText = $($("label[for='" + element[0].id + "']")).text();
+        var validationMessage = rule1.validate(fieldValue, $.trim(labelText).replace(":", ""));
+        if (validationMessage) {//Error exists
+            showFieldErrors($(element), validationMessage);
+            return false;
+        } else {//Data submitted is valid
+            clearFieldErrors($(element));
+            return true;
+        }
     }
 
     function init() {
@@ -224,21 +248,10 @@ $(function () {
                     .each(function () {
                         var isValidate = $(this).data("validate");
                         if (isValidate) {
-                            console.log("VALIDATING!");
                             //Get all validation rules
                             var validationRules = isValidate;
-                            var rule1 = new $V.Validator();
-                            rule1.name = validationRules;
-                            var fieldValue = $(this).val();
-                            //console.log();
-                            var labelText = $($("label[for='" + this.id + "']")[0]).text();
-                            //$("label[for='"+$(this)[0].id+"']").text()
-                            var validationMessage = rule1.validate(fieldValue, $.trim(labelText).replace(":", ""));
-                            if (validationMessage) {//Error exists
-                                showFieldErrors($(this), validationMessage);
+                            if (!performValidation($(this), validationRules)) {
                                 isFormValid = false;
-                            } else {//Data submitted is valid
-                                clearFieldErrors($(this));
                             }
                         }
                     });
