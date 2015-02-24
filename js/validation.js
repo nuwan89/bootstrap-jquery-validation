@@ -7,11 +7,17 @@ $V.settings = {
     dyn: false,
     animate: false,
     iconFeedback: false,
-    tes: "TEST"
+    tes: "TEST",
+    async: false,
+    onSuccessfullSubmit: function () {
+        return true;
+    }
 };
 $V.load = function (custom) {
     $.extend(true, $V.settings, custom);
 };
+//In case of when user provides with async function
+$V.isFormAlreadySubmitted = false;
 //Handles validation
 $(function () {
     /**
@@ -49,6 +55,9 @@ $(function () {
                 //return errorMessage;
             } else if (this.rules[i].match(/custom\(\w+\)/)) {
                 errorMessage = this.customValidate(this.rules[i], fieldValue);
+                //return errorMessage;
+            } else if (this.rules[i] === "nic") {
+                errorMessage = this.nicValidate(fieldValue);
                 //return errorMessage;
             }
             if (errorMessage && errorMessage !== "") {
@@ -139,6 +148,15 @@ $(function () {
             return window[methodName](text);
         }
     };
+    /**
+     Returns nothing (undefined) if text is empty string or returns error message 
+     if the NIC is incorrect
+     */
+    $V.Validator.prototype.nicValidate = function (text) {
+        if (text !== "" && !(/^\d{9}\s?[vxVX]$/).test(text)) {
+            return "N.I.C is invalid";
+        }
+    };
     //Object.preventExtensions($V.Validator);
 
     $("#bt").click(function () {
@@ -208,6 +226,17 @@ $(function () {
         }
     }
 
+    $V.asyncSubmit = function (result, form) {
+        if (result) {
+            $V.isFormAlreadySubmitted = true;
+            console.log(" submitting");
+            $(form).submit();
+        } else {
+            $V.isFormAlreadySubmitted = false;
+            console.log("not submitting");
+        }
+    };
+
     function init() {
         if ($V.settings.dyn) {
             setupDynamic();
@@ -216,7 +245,17 @@ $(function () {
         $("form").each(function () {
             if ($(this).data("validate")) {
                 $(this).submit(function (event) {
-                    return validate($(this));
+                    if (validate($(this))) {
+                        if ($V.isFormAlreadySubmitted) {
+                            return true;
+                        } else if ($V.settings.async === true) {
+                            event.preventDefault();
+                            $V.settings.onSuccessfullSubmit($(this));
+                        } else {
+                            return $V.settings.onSuccessfullSubmit();
+                        }
+                    }
+                    return false;
                 });
             }
         });
@@ -240,6 +279,7 @@ $(function () {
             //.css("visibility","hidden");
         }
         function validate(form) {
+            console.log("RUNNING VALI");
             /**
              The following code will select all validation required elements
              */

@@ -43,7 +43,7 @@
     <div class="form-group">
         <label for="details" class="col-sm-3">Details :</label>
         <span class="col-sm-9">
-            <textarea name="details" type="text" id="details" class="form-control" data-validate="not empty,number,minLength(3),maxLength(5)"></textarea>
+            <textarea name="details" type="text" id="details" class="form-control" data-validate="nic"></textarea>
         </span>
     </div>
     <input type="submit" />
@@ -54,16 +54,10 @@
 <button id="bt">Fade out</button>
 <button id="bt2">Fade in</button>
 <script>
-    $V.load({dyn:true, iconFeedback:true});
-    function myf(text){
-        console.log("Myf");
-        if(text.match(/^fuck/)){
-            return "No bad words are allowed!";
-        }
-    }
+    $V.load({dyn:true, iconFeedback:true, onSuccessfullSubmit: function(){alert("Hurray!"); return false;}});
 /*
     (function($){
-        console.log("333333333333333333333333333333333333333333");
+        console.log("33");
         console.log($V.settings);
         //$.$V.dyn = {on:true};
         $.fn.pl = function(){
