@@ -173,7 +173,7 @@ $(function () {
      listener validation.
      */
     function setupDynamic() {
-        $(".form-horizontal .form-group").find("input[type=text].form-control, textarea.form-control")
+        $(".form-horizontal .form-group").find("input[type=text].form-control, input[type=password].form-control, textarea.form-control")
                 .each(function () {
                     if ($(this).data("validation-summernote")) {
                         var isValidate = $(this).data("validate");
@@ -265,7 +265,7 @@ $(function () {
          */
         var appendedElement = $("<span class='error-field-text alert-danger'>ERROR TEXT</span>")
                 .addClass("col-sm-12").css("visibility", "hidden").css("textAlign", "right");
-        $(".form-horizontal .form-group").find("input[type=text].form-control, textarea.form-control")
+        $(".form-horizontal .form-group").find("input[type=text].form-control, input[type=password].form-control, textarea.form-control")
                 .parent().append(appendedElement);
         /**
          Add icon spans if user enables. Appended next to (after) error spans.
@@ -284,7 +284,7 @@ $(function () {
              The following code will select all validation required elements
              */
             var isFormValid = true;
-            $(form).find(".form-group input[type=text].form-control, textarea.form-control")
+            $(form).find(".form-group input[type=text].form-control, .form-group input[type=password].form-control, textarea.form-control")
                     .each(function () {
                         var isValidate = $(this).data("validate");
                         if (isValidate) {
